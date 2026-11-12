@@ -22,9 +22,10 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+
       - name: installation des dependances
         run: pnpm install --frozen-lockfile
-
+        
       - name: lancer le build
         run: pnpm build
 
