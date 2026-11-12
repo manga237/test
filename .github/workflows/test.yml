@@ -24,8 +24,8 @@ jobs:
           cache: pnpm
 
       - name: installation des dependances
-        run: pnpm install --frozen-lockfile
-        
+        run: pnpm install
+
       - name: lancer le build
         run: pnpm build
 
