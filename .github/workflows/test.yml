@@ -1,0 +1,31 @@
+name: premier test de build
+
+on:
+  push:
+    branches:
+      - backend
+
+jobs:
+  build:
+    name: build-branche backend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: copie du repository
+        uses: actions/checkout@v4
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: setup nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: installation des dependances
+        run: pnpm install --frozen-lockfile
+
+      - name: lancer le build
+        run: pnpm build
+
+
