@@ -6,7 +6,31 @@ on:
       - backend
 
 jobs:
+  lint:
+    name: lint-branche backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: copie du repository
+        uses: actions/checkout@v4
+
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: installation de node
+        uses: actions/setup-node@v4
+        with:
+          cache: pnpm
+          
+      - name: installation des dépendances
+        run: pnpm install
+        
+      - name: test de linting
+        run: pnpm lint
+
   build:
+    needs: lint
     name: build-branche backend
     runs-on: ubuntu-latest
     
