@@ -76,6 +76,23 @@ jobs:
               --head "$BRANCH" \
               --title "AUTO PR Dépuis $BRANCH " \
               --body "PULL REQUEST lancé depuis la branche $BRANCH"
+      
+      - name: Check repository auto-merge settings
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          REPO: ${{ github.repository }}
+        run: |
+          echo "Repository: $REPO"
+
+          gh api "repos/$REPO" \
+            --jq '{
+              full_name,
+              allow_auto_merge,
+              allow_squash_merge,
+              allow_merge_commit,
+              allow_rebase_merge
+            }'
+        
       - name: fusionner les branches
         env: 
           GH_TOKEN: ${{ secrets.GH_PAT }} 
