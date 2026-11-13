@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - backend
+      
+permissions: 
+  contents: read
+  pull-requests: write
 
 jobs:
   lint:
@@ -53,5 +57,27 @@ jobs:
 
       - name: lancer le build
         run: pnpm build
+
+  create-pr: 
+    name: pull-request main
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: creation de la pr
+        env: 
+          GH_TOKEN: ${{ secrets.GH_PAT }} 
+          BRANCH: ${{ github.ref_name }}
+        run: |
+              gh pr create \
+              --base main \
+              --head "$BRANCH" \
+              --fill 
+      - name: fusionner les branches
+        env: 
+          GH_TOKEN: ${{ secrets.GH_PAT }} 
+          BRANCH: ${{ github.ref_name }}
+        run: gh pr merge "$BRANCH" --auto --squash
+
 
 
