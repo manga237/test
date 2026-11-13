@@ -74,7 +74,8 @@ jobs:
               gh pr create \
               --base main \
               --head "$BRANCH" \
-              --fill 
+              --title "AUTO PR Dépuis $BRANCH " \
+              --body "PULL REQUEST lancé depuis la branche $BRANCH"
       - name: fusionner les branches
         env: 
           GH_TOKEN: ${{ secrets.GH_PAT }} 
