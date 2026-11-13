@@ -1,0 +1,103 @@
+name: premier test de build
+
+on:
+  push:
+    branches:
+      - backend
+      
+permissions: 
+  contents: read
+  pull-requests: write
+
+jobs:
+  lint:
+    name: lint-branche backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: copie du repository
+        uses: actions/checkout@v4
+
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: installation de node
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+          cache: pnpm
+          
+      - name: installation des dépendances
+        run: pnpm install
+        
+      - name: test de linting
+        run: pnpm lint
+
+  build:
+    needs: lint
+    name: build-branche backend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: copie du repository
+        uses: actions/checkout@v4
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: setup nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: installation des dependances
+        run: pnpm install
+
+      - name: lancer le build
+        run: pnpm build
+
+  create-pr: 
+    name: pull-request main
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: recupération dur epository
+        uses: actions/checkout@v4
+      - name: creation de la pr
+        env: 
+          GH_TOKEN: ${{ secrets.GH_PAT }} 
+          BRANCH: ${{ github.ref_name }}
+        run: |
+              gh pr create \
+              --base main \
+              --head "$BRANCH" \
+              --title "AUTO PR Dépuis $BRANCH " \
+              --body "PULL REQUEST lancé depuis la branche $BRANCH"
+      
+      - name: Check repository auto-merge settings
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          REPO: ${{ github.repository }}
+        run: |
+          echo "Repository: $REPO"
+
+          gh api "repos/$REPO" \
+            --jq '{
+              full_name,
+              allow_auto_merge,
+              allow_squash_merge,
+              allow_merge_commit,
+              allow_rebase_merge
+            }'
+        
+      - name: fusionner les branches
+        env: 
+          GH_TOKEN: ${{ secrets.GH_PAT }} 
+          BRANCH: ${{ github.ref_name }}
+        run: gh pr merge "$BRANCH" --auto --squash
+
+
+
