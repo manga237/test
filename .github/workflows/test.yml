@@ -64,6 +64,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: recupération dur epository
+        uses: actions/checkout@v4
       - name: creation de la pr
         env: 
           GH_TOKEN: ${{ secrets.GH_PAT }} 
